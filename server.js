@@ -8,7 +8,7 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.Promise = Promise
 
 // post model 
-const Testimonies = mongoose.model('testimonies', {
+const Testimony = mongoose.model('testimony', {
   name: {
     type: String,
     minlength: 3,
@@ -86,7 +86,7 @@ app.use((req, res, next) => {
 // query here too RegExp too
 app.get('/testimonies', async (req, res) => {
   try {
-    const allTestimonies = await Testimonies.find(req.query)
+    const allTestimonies = await Testimony.find(req.query)
       .sort({ createdAt: 'desc' })
       .limit(20)
       .exec()
@@ -116,7 +116,7 @@ app.post('/testimonies', async (req, res) => {
   // send a request body in order to pass information into the API
   try {
     // success case
-    const NewTestimony = new Message({ 
+    const NewTestimony = new Testimony({ 
       name: req.body.name, 
       when_weeks: req.body.when_weeks, 
       when_weeks_noticed: req.body.when_weeks_noticed,
@@ -130,6 +130,7 @@ app.post('/testimonies', async (req, res) => {
     const savedTestimony = await NewTestimony.save()
     res.status(200).json(savedTestimony)
   } catch (err) {
+    console.log(err)
     // Bad request - notify the client that attempt to post was unsuccessful
     res.status(400).json({ message: "could not save testimony", errors: err.errors })
   }
