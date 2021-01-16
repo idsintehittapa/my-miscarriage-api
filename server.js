@@ -7,69 +7,119 @@ const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/my-miscarriage"
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.Promise = Promise
 
-//how does this work
-// One schema to rule them all and then models for each user and one for moderator?
-// post model 
-const Testimony = mongoose.model('testimony', {
-  name: {
-    type: String,
-    minlength: 3,
-    maxlength: 30,
-    default: "Anonymous"
-  },
-  when_weeks: {
-    // any: mongoose.Mixed,
-    type: String,
-    required: true
-  },
-  when_weeks_noticed: {
-    type: String,
-  },
-  physical_pain: {
-    type: String,
-  },
-  mental_pain: {
-    type: String,
-  },
-  hospital: {
-    type: Boolean
-  },
-  period_volume: {
-    type: String
-  },
-  period_length: {
-    type: String
-  },
-  period_pain: {
-    type: Boolean
-  },
-  story: {
-    type: String,
-    minlength: 3,
-    maxlength: 500,
-  },
-  //   hearts: {
-//     type: Number,
-//     default: 0
-//   },
-  createdAt: {
-    type: Date,
-    default: () => new Date()
+
+//_________Testimony schema
+const testimonySchema = new mongoose.Schema({
+    name: {
+      type: String,
+      minlength: 3,
+      maxlength: 30,
+      trim: true,
+      default: "Anonymous"
+    },
+    when_weeks: {
+      // make this into a range?
+      type: Number,
+      required: true,
+      min: 5,
+      max: 20
+    },
+    when_weeks_noticed: {
+      // make this into a range?
+      type: Number,
+      required: true,
+      min: 5,
+      max: 20
+    },
+    physical_pain: {
+      type: String,
+      enum: ['Painless', 'Painful', 'Severe Pain'], 
+    },
+    mental_pain: {
+      type: String,
+      enum: ['Painless', 'Painful', 'Severe Pain'], 
+    },
+    hospital: {
+      type: Boolean
+    },
+    period_volume: {
+      type: String,
+      enum: ['Increased', 'Decreased', 'Unchanged'], 
+    },
+    period_length: {
+      type: String,
+      enum: ['Fewer days', 'Additional days', 'Unchanged'], 
+    },
+    period_pain: {
+      type: Boolean
+    },
+    story: {
+      type: String,
+      trim: true,
+      minlength: 3,
+      maxlength: 1000,
+    },
+    //   hearts: {
+  //     type: Number,
+  //     default: 0
+  //   },
+    createdAt: {
+      type: Date,
+      default: () => new Date()
+    }
   }
-})
+)
+
+const Testimony = mongoose.model('testimony', testimonySchema)
+
+//_________Moderator schema
+// Question - how should I do this? I do not want users to be able to create accounts..
+
+// const ModeratorSchema = new mongoose.Schema({
+//   username: {
+//     type: String,
+//     unique: true,
+//     required: true,
+//     trim: true,
+//     minLength: 2,
+//     maxLength: 20,
+//   },
+//   password: {
+//     type: String,
+//     required: [true, 'a password is required'],
+//     minLength: 5,
+//   },
+//   email: {
+//     type: String,
+//     trim: true,
+//     unique: true,
+//     required: true,
+//     validate: [isEmail, 'invalid email']
+//   },
+//   accessToken: {
+//     type: String,
+//     default: () => crypto.randomBytes(128).toString("hex")
+//   }
+
+// }
+// )
+
+// const Testimony = mongoose.model('testimony', testimonySchema)
 
 // Defines the port the app will run on. Defaults to 8080, but can be 
 // overridden when starting the server. For example:
 //
 //   PORT=9000 npm start
+
+
 const port = process.env.PORT || 8080
 const app = express()
 
-// Add middlewares to enable cors and json body parsing
+//_________Add middlewares to enable cors and json body parsing
 app.use(cors())
 app.use(bodyParser.json())
 
-// server ready
+//_________Error message if server is down
 app.use((req, res, next) => {
   if (mongoose.connection.readyState === 1) {
     next()
@@ -79,10 +129,10 @@ app.use((req, res, next) => {
 })
 
 // // Doc
+const listEndpoints = require('express-list-endpoints')
 app.get('/', (req, res) => {
-  res.send('Hello world')
-  // add documentation here
-})
+  res.send(listEndpoints(app))
+}) // add correct documentation here
 
 // GET endpoints
 // query here too RegExp too
@@ -97,6 +147,7 @@ app.get('/testimonies', async (req, res) => {
     res.status(400).json({ message: "could not find testimony", errors: err.errors })
   }
 })
+// add page-nation to this
 
 // GET returns one object from the database via ID
 app.get('/testimonies/:id', async (req, res) => {
