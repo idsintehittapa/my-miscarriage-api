@@ -7,20 +7,18 @@ import { isEmail } from 'validator'
 const testimonySchema = new mongoose.Schema({
   name: {
     type: String,
-    minlength: 3,
     maxlength: 30,
     trim: true,
-    default: "Anonymous"
+    default: "Anonymous",
+    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
   },
   when_weeks: {
-    // make this into a range?
     type: Number,
     required: true,
     min: 5,
     max: 20
   },
   when_weeks_noticed: {
-    // make this into a range?
     type: Number,
     // required: true,
     min: 5,
@@ -43,7 +41,7 @@ const testimonySchema = new mongoose.Schema({
   },
   period_length: {
     type: String,
-    enum: ['Fewer days', 'Additional days', 'Unchanged'],
+    enum: ['Additional days', 'Fewer days', 'Unchanged'],
   },
   period_pain: {
     type: Boolean
@@ -51,8 +49,8 @@ const testimonySchema = new mongoose.Schema({
   story: {
     type: String,
     trim: true,
-    minlength: 3,
     maxlength: 1000,
+    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
   },
   //   hearts: {
   //     type: Number,
@@ -79,12 +77,14 @@ const moderatorSchema = new mongoose.Schema({
     required: true,
     minLength: 2,
     maxLength: 20,
+    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
   },
   password: {
     type: String,
     required: [true, 'a password is required'],
     minLength: 5,
     trim: true,
+    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
   },
   email: {
     type: String,
@@ -98,6 +98,7 @@ const moderatorSchema = new mongoose.Schema({
     trim: true,
     unique: true,
     required: [true, 'a code is required'],
+    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
   },
   accessToken: {
     type: String,

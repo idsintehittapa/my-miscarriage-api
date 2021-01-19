@@ -11,6 +11,8 @@ const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/my-miscarriage"
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.Promise = Promise
 
+const mongoosePaginate = require('mongoose-paginate-v2')
+
 
 
 
@@ -66,17 +68,20 @@ app.get('/', (req, res) => {
 // this works
 // query here too RegExp too
 // add page-nation to this
+
 app.get('/testimonies', async (req, res) => {
   try {
     const allTestimonies = await Testimony.find(req.query)
       .sort({ createdAt: 'desc' })
       .limit(20)
+      .skip(2)
       .exec()
     res.status(200).json(allTestimonies)
   } catch (error) {
     res.status(400).json({ message: "could not find testimony", errors: err.errors })
   }
 })
+
 
 
 // GET returns one object from the database via ID
