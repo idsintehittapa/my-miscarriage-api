@@ -65,24 +65,31 @@ app.get('/', (req, res) => {
 }) // add correct documentation here
 
 // GET endpoints
-// this works
-// query here too RegExp too
-// add page-nation to this
-
+      // query here too RegExp too
 app.get('/testimonies', async (req, res) => {
+  // Pagination page and limit set to default values
+  const { page = 1, limit = 10 } = req.query
   try {
-    const allTestimonies = await Testimony.find(req.query)
+    // execute query with page and limit values
+    const allTestimonies = await Testimony.find()
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
       .sort({ createdAt: 'desc' })
-      .limit(20)
-      .skip(2)
-      .exec()
-    res.status(200).json(allTestimonies)
+      .exec();
+
+    // get total entries in the collection
+    const count = await Testimony.countDocuments();
+
+    // return response with, total pages and current page
+    res.status(200).json({
+      allTestimonies,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page
+    });
   } catch (error) {
-    res.status(400).json({ message: "could not find testimony", errors: err.errors })
+    res.status(400).json({ message: "could not find testimony", errors: error.errors })
   }
 })
-
-
 
 // GET returns one object from the database via ID
 // this works
