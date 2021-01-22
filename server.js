@@ -69,23 +69,26 @@ app.get('/', (req, res) => {
 app.get('/testimonies', async (req, res) => {
   // Pagination page and limit set to default values
   const { page = 1, limit = 10 } = req.query
+  delete(req.query.page)
+  delete(req.query.limit)
+
   try {
     // execute query with page and limit values
-    const allTestimonies = await Testimony.find()
+    const allTestimonies = await Testimony.find(req.query)
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: 'desc' })
-      .exec();
+      .exec()
 
     // get total entries in the collection
     const count = await Testimony.countDocuments();
 
     // return response with, total pages and current page
     res.status(200).json({
-      allTestimonies,
       totalPages: Math.ceil(count / limit),
-      currentPage: page
-    });
+      currentPage: page,
+      allTestimonies,
+    })
   } catch (error) {
     res.status(400).json({ message: "could not find testimony", errors: error.errors })
   }
@@ -131,9 +134,9 @@ app.get('/users/:id/moderator', authenticateModerator)
 // this works
 app.post('/signup', async (req, res) => {
   try {
-    const { username, email, password, code  } = req.body
-    const user = await new Moderator({ username, email, password, code }).save()
-    res.status(201).json({ userId: user._id, userName: user.name, accessToken: user.accessToken })
+    const { email, password } = req.body
+    const user = await new Moderator({ email, password }).save()
+    res.status(201).json({ userId: user._id, accessToken: user.accessToken })
   } catch (err) {
     res.status(400).json({
       message: "Could not create user", errors: {
@@ -148,10 +151,10 @@ app.post('/signup', async (req, res) => {
 //_________POST Log in user endpoint
 app.post('/login', async (req, res) => {
   try {
-    const { username, email, password } = req.body
-    const user = await Moderator.findOne({ username, email })
+    const { email, password } = req.body
+    const user = await Moderator.findOne({ email, password })
     if (user && bcrypt.compareSync(password, user.password)) {
-      res.status(201).json({ userId: user._id, userName: user.name, accessToken: user.accessToken })
+      res.status(201).json({ userId: user._id , accessToken: user.accessToken })
     } else {
       res.status(404).json({ notFound: true })
     }
@@ -160,6 +163,7 @@ app.post('/login', async (req, res) => {
   }
 })
 
+//_________I guess I need to have some kind of moderate endpoint too?
 
 //_________Start the server
 app.listen(port, () => {

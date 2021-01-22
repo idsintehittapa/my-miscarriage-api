@@ -67,24 +67,21 @@ export const Testimony = mongoose.model('testimony', testimonySchema)
 
 
 //_________Moderator schema
-// So, in this schema you can create a user adding a specific code that has been given
-// by super admin aka me ^^
 const moderatorSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    unique: true,
-    trim: true,
-    required: true,
-    minLength: 2,
-    maxLength: 20,
-    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
-  },
+  // username: {
+  //   type: String,
+  //   trim: true,
+  //   required: true,
+  //   minLength: 2,
+  //   maxLength: 20,
+  //   validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
+  // },
   password: {
     type: String,
     required: [true, 'a password is required'],
-    minLength: 5,
+    // minLength: 5,
     trim: true,
-    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
+    // validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
   },
   email: {
     type: String,
@@ -92,13 +89,6 @@ const moderatorSchema = new mongoose.Schema({
     unique: true,
     required: true,
     validate: [isEmail, 'invalid email']
-  },
-  code: {
-    type: String,
-    trim: true,
-    unique: true,
-    required: [true, 'a code is required'],
-    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
   },
   accessToken: {
     type: String,
