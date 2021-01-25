@@ -33,7 +33,7 @@ const testimonySchema = new mongoose.Schema({
     enum: ['Painless', 'Painful', 'Severe Pain'],
   },
   hospital: {
-    type: Boolean
+    type: Boolean,
   },
   period_volume: {
     type: String,
@@ -44,13 +44,14 @@ const testimonySchema = new mongoose.Schema({
     enum: ['Additional days', 'Fewer days', 'Unchanged'],
   },
   period_pain: {
-    type: Boolean
+    type: Boolean,
   },
   story: {
     type: String,
     trim: true,
-    maxlength: 1000,
-    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
+    // maxlength: 1000,
+    // validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
+    // this is not working as it should
   },
   //   hearts: {
   //     type: Number,
@@ -59,6 +60,11 @@ const testimonySchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: () => new Date()
+  },
+  post: {
+    type: String,
+    enum: ['pending', 'approved', 'decline'],
+    default: 'pending'
   }
 }
 )
