@@ -10,7 +10,7 @@ const testimonySchema = new mongoose.Schema({
     maxlength: 30,
     trim: true,
     default: "Anonymous",
-    validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
+    // validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
   },
   when_weeks: {
     type: Number,

@@ -99,8 +99,8 @@ app.get('/testimonies', async (req, res) => {
 app.get('/testimonies/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const singleProfanity = await Testimony.findOne({ _id: id })
-    res.status(200).json(singleProfanity)
+    const singleTestimony = await Testimony.findOne({ _id: id })
+    res.status(200).json(singleTestimony)
   } catch (err) {
     res.status(404).json({ error: 'testimony not found', errors: err.error })
   }
@@ -132,7 +132,7 @@ app.get('/users/:id/moderator', authenticateModerator)
 
 //_________POST create moderator
 // this works
-app.post('/signup', async (req, res) => {
+app.post('/users', async (req, res) => {
   try {
     const { email, password } = req.body
     const user = await new Moderator({ email, password }).save()
@@ -149,7 +149,7 @@ app.post('/signup', async (req, res) => {
 
 // LOGIN moderator
 //_________POST Log in user endpoint
-app.post('/login', async (req, res) => {
+app.post('/sessions', async (req, res) => {
   try {
     const { email, password } = req.body
     const user = await Moderator.findOne({ email, password })
