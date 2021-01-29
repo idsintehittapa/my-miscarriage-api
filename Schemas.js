@@ -44,7 +44,8 @@ const testimonySchema = new mongoose.Schema({
     enum: ['Additional days', 'Fewer days', 'Unchanged'],
   },
   period_pain: {
-    type: Boolean,
+    type: String,
+    enum: ['Increased', 'Decreased', 'Unchanged'],
   },
   story: {
     type: String,
