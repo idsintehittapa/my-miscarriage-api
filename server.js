@@ -6,6 +6,7 @@ import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 import { isEmail } from 'validator'
 
+
 // import { Testimony, User } from './Schemas'
 
 
@@ -109,6 +110,19 @@ const userSchema = new mongoose.Schema({
   }
 })
 
+//_________Middleware to hash password before new user is saved
+userSchema.pre('save', async function (next) {
+  const user = this
+  if (!user.isModified('password')) {
+    return next()
+  }
+  const salt = bcrypt.genSaltSync()
+  // Hash the password – this happens after the validation.
+  user.password = bcrypt.hashSync(user.password, salt)
+  next()
+})
+
+
 const User = mongoose.model('user', userSchema)
 
 // Defines the port the app will run on. Defaults to 8080, but can be 
@@ -142,19 +156,6 @@ const authenticateUser = async (req, res, next) => {
       .json({ message: "Access token is missing or wrong", errors: err })
   }
 }
-
-//_________Middleware to hash password before new user is saved
-userSchema.pre('save', async function (next) {
-  const user = this
-  if (!user.isModified('password')) {
-    return next()
-  }
-  const salt = bcrypt.genSaltSync(10)
-  // Hash the password – this happens after the validation.
-  user.password = bcrypt.hashSync(user.password, salt)
-  next()
-})
-
 
 //_________Error message if server is down
 app.use((req, res, next) => {
@@ -247,7 +248,7 @@ app.post('/users', async (req, res) => {
       email,
       password,
     }).save()
-    console.log(user)
+    console.log("testing", user)
     res.status(201).json({ userId: user._id, accessToken: user.accessToken, email: user.email })
   } catch (err) {
     res.status(400).json({
@@ -266,12 +267,15 @@ app.post('/sessions', async (req, res) => {
     const { email, password } = req.body
     const user = await User.findOne({ email })
     console.log('User:', user)
+    console.log(user.password)
     if (user && bcrypt.compareSync(password, user.password)) {
+      console.log(user.password)
       res.status(201).json({ 
         userID: user._id, 
         accessToken: user.accessToken, 
         email: user.email })
     } else {
+      // throw new Error (Error.toString())
       res.status(404).json({
         message:
           'Oops, something went wrong. Check your username and/or password!'
