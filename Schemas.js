@@ -15,49 +15,52 @@ const testimonySchema = new mongoose.Schema({
   when_weeks: {
     type: Number,
     required: true,
-    min: 5,
-    max: 20
+    min: 6,
+    max: 99
   },
   when_weeks_noticed: {
     type: Number,
-    // required: true,
-    min: 5,
-    max: 25
+    required: true,
+    min: 6,
+    max: 99
   },
   physical_pain: {
     type: String,
+    required: true,
     enum: ['Painless', 'Painful', 'Severe Pain'],
   },
   mental_pain: {
     type: String,
+    required: true,
     enum: ['Painless', 'Painful', 'Severe Pain'],
   },
   hospital: {
     type: Boolean,
+    required: true,
   },
   period_volume: {
     type: String,
+    required: true,
     enum: ['Increased', 'Decreased', 'Unchanged'],
   },
   period_length: {
     type: String,
+    required: true,
     enum: ['Additional days', 'Fewer days', 'Unchanged'],
   },
   period_pain: {
     type: String,
+    required: true,
     enum: ['Increased', 'Decreased', 'Unchanged'],
   },
   story: {
     type: String,
     trim: true,
+    required: true,
     // maxlength: 1000,
     // validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
     // this is not working as it should
   },
-  //   hearts: {
-  //     type: Number,
-  //     default: 0
-  //   },
   createdAt: {
     type: Date,
     default: () => new Date()
@@ -72,17 +75,8 @@ const testimonySchema = new mongoose.Schema({
 
 export const Testimony = mongoose.model('testimony', testimonySchema)
 
-
 //_________Moderator schema
 const userSchema = new mongoose.Schema({
-  // username: {
-  //   type: String,
-  //   trim: true,
-  //   required: true,
-  //   minLength: 2,
-  //   maxLength: 20,
-  //   validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
-  // },
   password: {
     type: String,
     required: [true, 'a password is required'],
@@ -103,12 +97,13 @@ const userSchema = new mongoose.Schema({
   }
 })
 
+//_________Middleware to hash password before new user is saved
 userSchema.pre('save', async function (next) {
   const user = this
   if (!user.isModified('password')) {
     return next()
   }
-  const salt = bcrypt.genSaltSync(10)
+  const salt = bcrypt.genSaltSync()
   // Hash the password – this happens after the validation.
   user.password = bcrypt.hashSync(user.password, salt)
   next()

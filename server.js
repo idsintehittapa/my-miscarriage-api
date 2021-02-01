@@ -2,128 +2,17 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import mongoose from 'mongoose'
-import crypto from 'crypto'
+// import crypto from 'crypto'
 import bcrypt from 'bcrypt'
-import { isEmail } from 'validator'
+// import { isEmail } from 'validator'
 
 
-// import { Testimony, User } from './Schemas'
+import { Testimony, User } from './Schemas'
 
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/my-miscarriage"
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.Promise = Promise
-
-//_________Testimony schema
-const testimonySchema = new mongoose.Schema({
-  name: {
-    type: String,
-    maxlength: 30,
-    trim: true,
-    default: "Anonymous",
-    // validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
-  },
-  when_weeks: {
-    type: Number,
-    required: true,
-    min: 5,
-    max: 20
-  },
-  when_weeks_noticed: {
-    type: Number,
-    // required: true,
-    min: 5,
-    max: 25
-  },
-  physical_pain: {
-    type: String,
-    enum: ['Painless', 'Painful', 'Severe Pain'],
-  },
-  mental_pain: {
-    type: String,
-    enum: ['Painless', 'Painful', 'Severe Pain'],
-  },
-  hospital: {
-    type: Boolean,
-  },
-  period_volume: {
-    type: String,
-    enum: ['Increased', 'Decreased', 'Unchanged'],
-  },
-  period_length: {
-    type: String,
-    enum: ['Additional days', 'Fewer days', 'Unchanged'],
-  },
-  period_pain: {
-    type: String,
-    enum: ['Increased', 'Decreased', 'Unchanged'],
-  },
-  story: {
-    type: String,
-    trim: true,
-    // maxlength: 1000,
-    // validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
-    // this is not working as it should
-  },
-  createdAt: {
-    type: Date,
-    default: () => new Date()
-  },
-  post: {
-    type: String,
-    enum: ['pending', 'approved', 'decline'],
-    default: 'pending'
-  }
-}
-)
-
-const Testimony = mongoose.model('testimony', testimonySchema)
-
-
-//_________Moderator schema
-const userSchema = new mongoose.Schema({
-  // username: {
-  //   type: String,
-  //   trim: true,
-  //   required: true,
-  //   minLength: 2,
-  //   maxLength: 20,
-  //   validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
-  // },
-  password: {
-    type: String,
-    required: [true, 'a password is required'],
-    minLength: 5,
-    trim: true,
-    // validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
-  },
-  email: {
-    type: String,
-    trim: true,
-    unique: true,
-    required: true,
-    validate: [isEmail, 'invalid email']
-  },
-  accessToken: {
-    type: String,
-    default: () => crypto.randomBytes(128).toString("hex")
-  }
-})
-
-//_________Middleware to hash password before new user is saved
-userSchema.pre('save', async function (next) {
-  const user = this
-  if (!user.isModified('password')) {
-    return next()
-  }
-  const salt = bcrypt.genSaltSync()
-  // Hash the password – this happens after the validation.
-  user.password = bcrypt.hashSync(user.password, salt)
-  next()
-})
-
-
-const User = mongoose.model('user', userSchema)
 
 // Defines the port the app will run on. Defaults to 8080, but can be 
 // overridden when starting the server. For example:
@@ -214,6 +103,26 @@ app.get('/testimonies/:id', async (req, res) => {
     res.status(404).json({ error: 'testimony not found', errors: err.error })
   }
 })
+
+/// GET pending posts moderator via accessToken
+app.get('/pending', authenticateUser )
+app.get('/pending', async (req, res) => {
+  try {
+    // const { pending } = req.params
+    const pendingTestimonies = await Testimony.find()
+      console.log(pendingTestimonies)
+      const pendingStatus = pendingTestimonies.filter((testimony) => testimony.post === 'pending') 
+          .limit(5)
+          .sort({ createdAt: 'desc' })
+          .exec()
+          console.log(pendingStatus)
+          res.status(200).json(pendingStatus)
+
+      } catch (error) {
+    res.status(400).json({ message: "could not find pending testimonies", errors: error.errors })
+  }
+})
+
 
 //_________POST testimonies
 // this works
