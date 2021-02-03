@@ -142,7 +142,8 @@ app.patch('/moderator/pending/:id', async (req, res) => {
       { _id: id },
       { name: req.body.name, 
         story: req.body.story, 
-        post: req.body.post},
+        post: req.body.post
+      },
       { new: true })
       res.status(200).json(modifiedTestimony)
       console.log('modifiedTestimony:', modifiedTestimony)
