@@ -104,9 +104,9 @@ app.get('/testimonies/:id', async (req, res) => {
   }
 })
 
-//_________ GET pending posts moderator via accessToken // this works
-app.get('/pending', authenticateUser )
-app.get('/pending', async (req, res) => {
+//_________ GET secure endpoint to show moderator pending posts // this works
+app.get('/moderator/pending', authenticateUser)
+app.get('/moderator/pending', async (req, res) => {
   try {
     const pendingTestimonies = await Testimony
       .find({post: "pending"})
@@ -121,15 +121,52 @@ app.get('/pending', async (req, res) => {
   }
 })
 
-//_________ GET Secure endpoint, user needs to be logged in to access this moderator-page?
-app.get('/users/:id/moderator', authenticateUser)
+//_________ GET Secure endpoint for pending post by _id
+app.get('/moderator/pending/:id', authenticateUser)
+app.get('/moderator/pending/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const singleTestimony = await Testimony.findOne({ _id: id })
+    res.status(200).json(singleTestimony)
+  } catch (err) {
+    res.status(404).json({ error: 'testimony not found', errors: err.error })
+  }
+})
 
+//_________ PATCH Secure endpoint update 
+app.patch('/moderator/pending/:id', authenticateUser)
+app.patch('/moderator/pending/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    const modifiedTestimony = await Testimony.findOneAndUpdate(
+      { _id: id },
+      { name: req.body.name, 
+        story: req.body.story, 
+        post: req.body.post},
+      { new: true })
+      res.status(200).json(modifiedTestimony)
+      console.log('modifiedTestimony:', modifiedTestimony)
+    } catch(err) {
+      res.status(400).json({ 
+      message: 'Update failed.', 
+      error_message: err.message, error: err })
+    }
+  })
 
 //_________POST testimonies
 // this works
 app.post('/testimonies', async (req, res) => {
   try {
-    const { name, when_weeks, when_weeks_noticed, physical_pain, mental_pain, hospital, period_volume, period_length, period_pain,
+    const { 
+      name, 
+      when_weeks, 
+      when_weeks_noticed, 
+      physical_pain, 
+      mental_pain, 
+      hospital, 
+      period_volume, 
+      period_length, 
+      period_pain,
       story } = req.body
     const NewTestimony = await new Testimony({
       name, when_weeks, when_weeks_noticed, physical_pain, mental_pain, hospital, period_volume, period_length, period_pain,
@@ -165,6 +202,7 @@ app.post('/users', async (req, res) => {
     })
   }
 })
+
 
 
 // LOGIN moderator
