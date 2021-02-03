@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
   res.send(listEndpoints(app))
 }) // add correct documentation here
 
-// GET endpoints
+//_________ GET endpoints - getting all testimonies
 // query here too RegExp too
 app.get('/testimonies', async (req, res) => {
   // Pagination page and limit set to default values
@@ -92,7 +92,7 @@ app.get('/testimonies', async (req, res) => {
   }
 })
 
-// GET returns one object from the database via ID
+//_________ GET returns one object from the database via ID
 // this works
 app.get('/testimonies/:id', async (req, res) => {
   try {
@@ -104,24 +104,25 @@ app.get('/testimonies/:id', async (req, res) => {
   }
 })
 
-/// GET pending posts moderator via accessToken
+//_________ GET pending posts moderator via accessToken // this works
 app.get('/pending', authenticateUser )
 app.get('/pending', async (req, res) => {
   try {
-    // const { pending } = req.params
-    const pendingTestimonies = await Testimony.find()
-      console.log(pendingTestimonies)
-      const pendingStatus = pendingTestimonies.filter((testimony) => testimony.post === 'pending') 
-          .limit(5)
-          .sort({ createdAt: 'desc' })
-          .exec()
-          console.log(pendingStatus)
-          res.status(200).json(pendingStatus)
+    const pendingTestimonies = await Testimony
+      .find({post: "pending"})
+      .limit(5)
+      .sort({ createdAt: 'desc' })
 
-      } catch (error) {
-    res.status(400).json({ message: "could not find pending testimonies", errors: error.errors })
+    res.status(200).json(pendingTestimonies)
+
+  } catch (error) {
+    console.log(error)
+    res.status(404).json({ message: "could not find pending testimonies", errors: error.errors })
   }
 })
+
+//_________ GET Secure endpoint, user needs to be logged in to access this moderator-page?
+app.get('/users/:id/moderator', authenticateUser)
 
 
 //_________POST testimonies
@@ -144,9 +145,6 @@ app.post('/testimonies', async (req, res) => {
     })
   }
 })
-
-//_________Secure endpoint, user needs to be logged in to access this moderator-page?
-app.get('/users/:id/moderator', authenticateUser)
 
 //_________POST create moderator
 // this works
@@ -184,7 +182,6 @@ app.post('/sessions', async (req, res) => {
         accessToken: user.accessToken, 
         email: user.email })
     } else {
-      // throw new Error (Error.toString())
       res.status(404).json({
         message:
           'Oops, something went wrong. Check your username and/or password!'
@@ -199,7 +196,7 @@ app.post('/sessions', async (req, res) => {
   }
 })
 
-//_________I guess I need to have some kind of moderate endpoint too?
+//_________PUT endpoint?
 
 //_________Start the server
 app.listen(port, () => {
