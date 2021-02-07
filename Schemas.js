@@ -41,17 +41,17 @@ const testimonySchema = new mongoose.Schema({
   period_volume: {
     type: String,
     required: true,
-    enum: ['Increased', 'Decreased', 'Unchanged'],
+    enum: ['Increased', 'Decreased', 'Unchanged', "Don't know yet"],
   },
   period_length: {
     type: String,
     required: true,
-    enum: ['Additional days', 'Fewer days', 'Unchanged'],
+    enum: ['Additional days', 'Fewer days', 'Unchanged', "Don't know yet"],
   },
   period_pain: {
     type: String,
     required: true,
-    enum: ['Increased', 'Decreased', 'Unchanged'],
+    enum: ['Increased', 'Decreased', 'Unchanged', "Don't know yet"],
   },
   story: {
     type: String,
@@ -110,3 +110,17 @@ userSchema.pre('save', async function (next) {
 })
 
 export const User = mongoose.model('user', userSchema)
+
+//_________Configuration schema
+const signupkeysSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+  },
+  key: {
+    type: String,
+    required: true,
+  }
+})
+
+export const SignUpKeys = mongoose.model('signupkey', signupkeysSchema)

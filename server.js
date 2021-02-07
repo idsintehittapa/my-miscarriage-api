@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt'
 // import { isEmail } from 'validator'
 
 
-import { Testimony, User } from './Schemas'
+import { SignUpKeys, Testimony, User } from './Schemas'
 
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/my-miscarriage"
@@ -109,7 +109,7 @@ app.get('/moderator/pending', authenticateUser)
 app.get('/moderator/pending', async (req, res) => {
   try {
     const pendingTestimonies = await Testimony
-      .find({post: "pending"})
+      .find({ post: "pending" })
       .limit(5)
       .sort({ createdAt: 'desc' })
 
@@ -140,33 +140,35 @@ app.patch('/moderator/pending/:id', async (req, res) => {
   try {
     const modifiedTestimony = await Testimony.findOneAndUpdate(
       { _id: id },
-      { name: req.body.name, 
-        story: req.body.story, 
+      {
+        name: req.body.name,
+        story: req.body.story,
         post: req.body.post
       },
       { new: true })
-      res.status(200).json(modifiedTestimony)
-      console.log('modifiedTestimony:', modifiedTestimony)
-    } catch(err) {
-      res.status(400).json({ 
-      message: 'Update failed.', 
-      error_message: err.message, error: err })
-    }
-  })
+    res.status(200).json(modifiedTestimony)
+    console.log('modifiedTestimony:', modifiedTestimony)
+  } catch (err) {
+    res.status(400).json({
+      message: 'Update failed.',
+      error_message: err.message, error: err
+    })
+  }
+})
 
 //_________POST testimonies
 // this works
 app.post('/testimonies', async (req, res) => {
   try {
-    const { 
-      name, 
-      when_weeks, 
-      when_weeks_noticed, 
-      physical_pain, 
-      mental_pain, 
-      hospital, 
-      period_volume, 
-      period_length, 
+    const {
+      name,
+      when_weeks,
+      when_weeks_noticed,
+      physical_pain,
+      mental_pain,
+      hospital,
+      period_volume,
+      period_length,
       period_pain,
       story } = req.body
     const NewTestimony = await new Testimony({
@@ -187,8 +189,26 @@ app.post('/testimonies', async (req, res) => {
 //_________POST create moderator
 // this works
 app.post('/users', async (req, res) => {
+  const { email, key, password } = req.body
+
   try {
-    const { email, password } = req.body
+    const signupdata = await SignUpKeys.find({email: email, key: key});
+
+    if ( signupdata.length === 0 ) {
+      return res.status(401).json({
+        message: 'you are not authorized to register as a moderator',
+      })
+    }
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({
+      message: 'problem retrieving internal configuration',
+      error_message: err.message,
+      error: err,
+    })
+  }
+  try {
     const user = await new User({
       email,
       password,
@@ -216,10 +236,11 @@ app.post('/sessions', async (req, res) => {
     console.log(user.password)
     if (user && bcrypt.compareSync(password, user.password)) {
       console.log(user.password)
-      res.status(201).json({ 
-        userID: user._id, 
-        accessToken: user.accessToken, 
-        email: user.email })
+      res.status(201).json({
+        userID: user._id,
+        accessToken: user.accessToken,
+        email: user.email
+      })
     } else {
       res.status(404).json({
         message:
