@@ -66,7 +66,7 @@ app.get('/', (req, res) => {
 // query here too RegExp too
 app.get('/testimonies', async (req, res) => {
   // Pagination page and limit set to default values
-  const { page = 1, limit = 10 } = req.query
+  const { page = 1, limit = 20 } = req.query
   delete (req.query.page)
   delete (req.query.limit)
 
@@ -110,7 +110,7 @@ app.get('/moderator/pending', async (req, res) => {
   try {
     const pendingTestimonies = await Testimony
       .find({ post: "pending" })
-      .limit(5)
+      .limit(20)
       .sort({ createdAt: 'desc' })
 
     res.status(200).json(pendingTestimonies)
