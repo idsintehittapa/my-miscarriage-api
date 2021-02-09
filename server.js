@@ -192,9 +192,9 @@ app.post('/users', async (req, res) => {
   const { email, key, password } = req.body
 
   try {
-    const signupdata = await SignUpKeys.find({email: email, key: key});
+    const signupData = await SignUpKeys.find({email: email, key: key});
 
-    if ( signupdata.length === 0 ) {
+    if ( signupData.length === 0 ) {
       return res.status(401).json({
         message: 'you are not authorized to register as a moderator',
       })

@@ -1,7 +1,9 @@
-# Express Starter Project
+# What is this?
 
-This project includes the packages and babel setup for an express server, and is just meant to make things a little simpler to get up and running with.
+This is the RESTful API built for the open source project <a href="https://github.com/idsintehittapa/my-miscarriage">my-miscarriage</a> to support the aim of helping in sharing experienced miscarriage testimonies.
 
-## Getting started
+## RESTful API created for this project
+<a href="https://mymiscarriage.herokuapp.com">my-miscarriage-api</a>
 
-Install dependencies with `npm install`, then start the server by running `npm run dev`
+## Mymiscarriage Live
+<a href="https://mymiscarriage.netlify.app">my-miscarriage</a>
