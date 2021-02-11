@@ -79,7 +79,7 @@ app.get('/testimonies', async (req, res) => {
       .exec()
 
     // get total entries in the collection
-    const count = await Testimony.countDocuments();
+    const count = await Testimony.countDocuments()
 
     // return response with, total pages and current page
     res.status(200).json({
@@ -93,7 +93,6 @@ app.get('/testimonies', async (req, res) => {
 })
 
 //_________ GET returns one object from the database via ID
-// this works
 app.get('/testimonies/:id', async (req, res) => {
   try {
     const { id } = req.params
@@ -104,7 +103,7 @@ app.get('/testimonies/:id', async (req, res) => {
   }
 })
 
-//_________ GET secure endpoint to show moderator pending posts // this works
+//_________ GET secure endpoint to show moderator pending posts
 app.get('/moderator/pending', authenticateUser)
 app.get('/moderator/pending', async (req, res) => {
   try {
@@ -157,7 +156,6 @@ app.patch('/moderator/pending/:id', async (req, res) => {
 })
 
 //_________POST testimonies
-// this works
 app.post('/testimonies', async (req, res) => {
   try {
     const {
@@ -187,12 +185,11 @@ app.post('/testimonies', async (req, res) => {
 })
 
 //_________POST create moderator
-// this works
 app.post('/users', async (req, res) => {
   const { email, key, password } = req.body
 
   try {
-    const signupData = await SignUpKeys.find({email: email, key: key});
+    const signupData = await SignUpKeys.find({email: email, key: key})
 
     if ( signupData.length === 0 ) {
       return res.status(401).json({
@@ -225,8 +222,6 @@ app.post('/users', async (req, res) => {
 })
 
 
-
-// LOGIN moderator
 //_________POST Log in user endpoint
 app.post('/sessions', async (req, res) => {
   try {
@@ -256,7 +251,6 @@ app.post('/sessions', async (req, res) => {
   }
 })
 
-//_________PUT endpoint?
 
 //_________Start the server
 app.listen(port, () => {
