@@ -2,9 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import mongoose from 'mongoose'
-// import crypto from 'crypto'
 import bcrypt from 'bcrypt'
-// import { isEmail } from 'validator'
 
 
 import { SignUpKeys, Testimony, User } from './Schemas'
@@ -60,10 +58,9 @@ app.use((req, res, next) => {
 const listEndpoints = require('express-list-endpoints')
 app.get('/', (req, res) => {
   res.send(listEndpoints(app))
-}) // add correct documentation here
+})
 
 //_________ GET endpoints - getting all testimonies
-// query here too RegExp too
 app.get('/testimonies', async (req, res) => {
   // Pagination page and limit set to default values
   const { page = 1, limit = 20 } = req.query

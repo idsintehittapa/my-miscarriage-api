@@ -79,8 +79,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'a password is required'],
     minLength: 5,
     trim: true,
-    // validate: /^(?! +$)[A-Za-zăâîșțĂÂÎȘȚ -]+$/ //not allowing starting with whitespace
-  },
+    },
   email: {
     type: String,
     trim: true,
