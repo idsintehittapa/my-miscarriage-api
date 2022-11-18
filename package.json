@@ -22,7 +22,7 @@
     "mongoose": "^5.13.14",
     "mongoose-paginate-v2": "^1.5.0",
     "mpath": "^0.8.4",
-    "nodemon": "^2.0.15",
+    "nodemon": "^2.0.20",
     "validator": "^13.7.0"
   },
   "devDependencies": {
